@@ -1,11 +1,17 @@
 import { SpriteWithDynamicBody } from "../types";
+import { Player } from "../entities/Player";
 
 class PlayScene extends Phaser.Scene {
 
-    player: SpriteWithDynamicBody;    
+    player: Player;    
+    ground: Phaser.GameObjects.TileSprite;
+    startTrigger: SpriteWithDynamicBody;
 
     get gameHeight() {
         return this.game.config.height as number;
+    }
+    get gameWidth() {
+        return this.game.config.width as number;
     }
     constructor(){
         super("PlayScene");
@@ -14,29 +20,48 @@ class PlayScene extends Phaser.Scene {
     create(){
         this.createEnvironment();
         this.createPlayer();
-        this.registerPlayerControl();
+        this.startTrigger = this.physics.add.sprite(30, 30, null)
+        .setOrigin(0, 0)
+        .setAlpha(0);
 
+        this.physics.add.overlap(this.startTrigger, this.player, () => {
+            if (this.startTrigger.y === 30){
+                this.startTrigger.body.reset(30, this.gameHeight - 2);
+                return;
+            }
+            this.startTrigger.body.reset(9999, 9999);
+
+            const RollOutEvent = this.time.addEvent({
+                delay: 1000/60,
+                loop: true,
+                callback: () => {
+                    this.player.setVelocityX(60);
+                    this.ground.width +=15;  
+                    if(this.ground.width >= this.gameWidth){
+                        // we need to cut the excessively generated ground 
+                        this.ground.width = this.gameWidth;
+                        this.player.setVelocityX(0);
+                        RollOutEvent.remove();
+                    }
+                }
+            })
+        })
     }
 
     createPlayer(){
-    this.player = this.physics.add.sprite(0, this.gameHeight, "dino-idle").setOrigin(0, 1);
-    this.player
-    .setGravityY(5000)
-    .setCollideWorldBounds(true)
-    .setBodySize(44, 92);
+    this.player = new Player(this, 0, this.gameHeight);
     }
 
     createEnvironment(){
-        this.add.tileSprite(0, this.gameHeight, 100, 26, "ground")
+        this.ground =    this.add.tileSprite(0, this.gameHeight, 100, 26, "ground")
         .setOrigin(0, 1);
     }
+    update(time: number, delta: number): void {
 
-    registerPlayerControl(){
-        const spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-        spaceBar.on("down", () =>{
-            this.player.setVelocityY(-1500);
-        })
+
     }
+
+
 }
 
 export default PlayScene;
