@@ -35,6 +35,7 @@ class PlayScene extends Phaser.Scene {
                 delay: 1000/60,
                 loop: true,
                 callback: () => {
+                    this.player.playRunAnimation();
                     this.player.setVelocityX(60);
                     this.ground.width +=15;  
                     if(this.ground.width >= this.gameWidth){
