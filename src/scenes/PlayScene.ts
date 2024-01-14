@@ -8,8 +8,11 @@ class PlayScene extends GameScene {
     player: Player;    
     ground: Phaser.GameObjects.TileSprite;
     obstacles: Phaser.Physics.Arcade.Group;
-
+    gameOverText: Phaser.GameObjects.Image;
+    restartText: Phaser.GameObjects.Image;
     startTrigger: SpriteWithDynamicBody;
+
+    gameOverContainer: Phaser.GameObjects.Container;
     spawnInterval: number = 1500;
     spawnTime: number = 0;
     gameSpeed: number = 4;
@@ -22,10 +25,32 @@ class PlayScene extends GameScene {
         this.createEnvironment();
         this.createPlayer();
         this.obstacles = this.physics.add.group();
+        this.gameOverText = this.add.image(0, -60, "game-over");
+        this.restartText = this.add.image(0, 0, "restart").setInteractive();
+        this.restartText.scale = 0.75
+
+        this.gameOverContainer = this.add
+            .container(this.gameWidth / 2, this.gameHeight / 2 - 30)
+            .add([this.gameOverText, this.restartText])
+            .setAlpha(0);
 
         this.startTrigger = this.physics.add.sprite(30, 30, null)
         .setOrigin(0, 0)
         .setAlpha(0);
+
+        this.restartText.on("pointerdown", () => {
+            console.log("clicking restart");
+        })
+
+        this.physics.add.collider(this.player, this.obstacles, () => {
+            this.isGameRuninng = false;
+            this.physics.pause();
+            this.player.die();
+            this.gameOverContainer.setAlpha(1);
+
+            this.spawnTime = 0;
+            this.gameSpeed = 5;
+        })
 
         this.physics.add.overlap(this.startTrigger, this.player, () => {
             if (this.startTrigger.y === 30){
@@ -88,7 +113,8 @@ class PlayScene extends GameScene {
         const distance = Phaser.Math.Between(600, 900);
         this.obstacles
             .create(distance, this.gameHeight, `obstacle-${obstacleNumber}`)
-            .setOrigin(0, 1);
+            .setOrigin(0, 1)
+            .setImmovable();
     }
 }
 
