@@ -1,19 +1,19 @@
 import { SpriteWithDynamicBody } from "../types";
 import { Player } from "../entities/Player";
+import { GameScene } from "./GameScene";
+import { PRELOAD_CONFIG } from "..";
 
-class PlayScene extends Phaser.Scene {
+class PlayScene extends GameScene {
 
     player: Player;    
     ground: Phaser.GameObjects.TileSprite;
-    startTrigger: SpriteWithDynamicBody;
-    isGameRuninng: boolean = false;
+    obstacles: Phaser.Physics.Arcade.Group;
 
-    get gameHeight() {
-        return this.game.config.height as number;
-    }
-    get gameWidth() {
-        return this.game.config.width as number;
-    }
+    startTrigger: SpriteWithDynamicBody;
+    spawnInterval: number = 1500;
+    spawnTime: number = 0;
+    obstacleSpeed: number = 3;
+
     constructor(){
         super("PlayScene");
     }
@@ -21,6 +21,8 @@ class PlayScene extends Phaser.Scene {
     create(){
         this.createEnvironment();
         this.createPlayer();
+        this.obstacles = this.physics.add.group();
+
         this.startTrigger = this.physics.add.sprite(30, 30, null)
         .setOrigin(0, 0)
         .setAlpha(0);
@@ -51,20 +53,33 @@ class PlayScene extends Phaser.Scene {
         })
     }
 
-    createPlayer(){
-    this.player = new Player(this, 0, this.gameHeight);
+    update(time: number, delta: number): void {
+        if(!this.isGameRuninng) { return; }
+
+        this.spawnTime += delta;
+        if(this.spawnTime >= this.spawnInterval){
+            this.spawnObstacle();
+            this.spawnTime = 0;
+        }
+        Phaser.Actions.IncX(this.obstacles.getChildren(), -this.obstacleSpeed);
     }
 
+    createPlayer(){
+        this.player = new Player(this, 0, this.gameHeight);
+        }
+    
     createEnvironment(){
         this.ground =    this.add.tileSprite(0, this.gameHeight, 100, 26, "ground")
         .setOrigin(0, 1);
     }
-    update(time: number, delta: number): void {
 
-
+    spawnObstacle(){
+        const obstacleNumber: number = Math.floor(Math.random() * PRELOAD_CONFIG.cactusesCount) + 1;
+        const distance = Phaser.Math.Between(600, 900);
+        this.obstacles
+            .create(distance, this.gameHeight, `obstacle-${obstacleNumber}`)
+            .setOrigin(0, 1);
     }
-
-
 }
 
 export default PlayScene;
