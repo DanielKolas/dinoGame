@@ -26,9 +26,11 @@ class PlayScene extends GameScene {
         this.createPlayer();
         this.createObstacles();
         this.createGameOverContainer();
+        this.createAnimations();
         this.handleGameStart();
         this.handleObstacleCollisions();
         this.handleGameRestart();
+
     }
 
     update(time: number, delta: number): void {
@@ -58,6 +60,7 @@ class PlayScene extends GameScene {
         this.ground =    this.add.tileSprite(0, this.gameHeight, 100, 26, "ground")
         .setOrigin(0, 1);
     }
+
     createObstacles(){
         this.obstacles = this.physics.add.group();
 
@@ -73,19 +76,28 @@ class PlayScene extends GameScene {
             .add([this.gameOverText, this.restartText])
             .setAlpha(0);
     }
+    createAnimations(){
+        this.anims.create({
+            key: "enemy-bird-fly",
+            frames: this.anims.generateFrameNumbers("enemy-bird"),
+            frameRate: 6,
+            repeat: -1
+        })
+    }
 
     spawnObstacle(){
         const obstacleNumber: number = Math.floor(Math.random() * PRELOAD_CONFIG.cactusesCount + PRELOAD_CONFIG.birdsCount) + 1;
-        const distance = Phaser.Math.Between(600, 900);
+        const distance = Phaser.Math.Between(150, 300);
         let obstacle;
 
         if(obstacleNumber > PRELOAD_CONFIG.cactusesCount){
             const enemyPossibleHeight = [20, 70];
             const enemyHeigh = enemyPossibleHeight[Math.floor(Math.random() * 2)];
-            obstacle = this.obstacles.create(distance, this.gameHeight - enemyHeigh, "enemy-bird")
+            obstacle = this.obstacles.create(this.gameWidth + distance, this.gameHeight - enemyHeigh, "enemy-bird")
+            obstacle.play("enemy-bird-fly", true);
         }
         else { 
-            obstacle = this.obstacles.create(distance, this.gameHeight, `obstacle-${obstacleNumber}`)
+            obstacle = this.obstacles.create(this.gameWidth + distance, this.gameHeight, `obstacle-${obstacleNumber}`)
         }
         obstacle.setOrigin(0, 1).setImmovable(true);
     }
@@ -108,7 +120,7 @@ class PlayScene extends GameScene {
                 callback: () => {
                     this.player.playRunAnimation();
                     this.player.setVelocityX(60);
-                    this.ground.width +=15;  
+                    this.ground.width +=20;  
                     if(this.ground.width >= this.gameWidth){
                         // we need to cut the excessively generated ground 
                         this.ground.width = this.gameWidth;
@@ -138,6 +150,7 @@ class PlayScene extends GameScene {
         this.physics.add.collider(this.player, this.obstacles, () => {
             this.isGameRuninng = false;
             this.physics.pause();
+            this.anims.pauseAll();
             this.player.die();
             this.gameOverContainer.setAlpha(1);
 
