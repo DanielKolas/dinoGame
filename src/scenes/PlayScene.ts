@@ -24,7 +24,46 @@ class PlayScene extends GameScene {
     create(){
         this.createEnvironment();
         this.createPlayer();
+        this.createObstacles();
+        this.createGameOverContainer();
+        this.handleGameStart();
+        this.handleObstacleCollisions();
+        this.handleGameRestart();
+    }
+
+    update(time: number, delta: number): void {
+        if(!this.isGameRuninng) { return; }
+
+        this.spawnTime += delta;
+        if(this.spawnTime >= this.spawnInterval){
+            this.spawnObstacle();
+            this.spawnTime = 0;
+        }
+        Phaser.Actions.IncX(this.obstacles.getChildren(), -this.gameSpeed);
+
+            this.obstacles.getChildren().forEach((obstacle: SpriteWithDynamicBody)=>{
+                if(obstacle.getBounds().right < 0){
+                    this.obstacles.remove(obstacle);
+                }
+            })
+            this.ground.tilePositionX += this.gameSpeed
+        
+    }
+
+    createPlayer(){
+        this.player = new Player(this, 0, this.gameHeight);
+        }
+    
+    createEnvironment(){
+        this.ground =    this.add.tileSprite(0, this.gameHeight, 100, 26, "ground")
+        .setOrigin(0, 1);
+    }
+    createObstacles(){
         this.obstacles = this.physics.add.group();
+
+    }
+    createGameOverContainer(){
+
         this.gameOverText = this.add.image(0, -60, "game-over");
         this.restartText = this.add.image(0, 0, "restart").setInteractive();
         this.restartText.scale = 0.75
@@ -33,24 +72,21 @@ class PlayScene extends GameScene {
             .container(this.gameWidth / 2, this.gameHeight / 2 - 30)
             .add([this.gameOverText, this.restartText])
             .setAlpha(0);
+    }
 
+    spawnObstacle(){
+        const obstacleNumber: number = Math.floor(Math.random() * PRELOAD_CONFIG.cactusesCount) + 1;
+        const distance = Phaser.Math.Between(600, 900);
+        this.obstacles
+            .create(distance, this.gameHeight, `obstacle-${obstacleNumber}`)
+            .setOrigin(0, 1)
+            .setImmovable();
+    }
+
+    handleGameStart(){
         this.startTrigger = this.physics.add.sprite(30, 30, null)
         .setOrigin(0, 0)
         .setAlpha(0);
-
-        this.restartText.on("pointerdown", () => {
-            console.log("clicking restart");
-        })
-
-        this.physics.add.collider(this.player, this.obstacles, () => {
-            this.isGameRuninng = false;
-            this.physics.pause();
-            this.player.die();
-            this.gameOverContainer.setAlpha(1);
-
-            this.spawnTime = 0;
-            this.gameSpeed = 5;
-        })
 
         this.physics.add.overlap(this.startTrigger, this.player, () => {
             if (this.startTrigger.y === 30){
@@ -78,43 +114,29 @@ class PlayScene extends GameScene {
         })
     }
 
-    update(time: number, delta: number): void {
-        if(!this.isGameRuninng) { return; }
+    handleGameRestart(){
+        this.restartText.on("pointerdown", () => {
+            this.physics.resume();
+            this.player.setVelocityY(0);
 
-        this.spawnTime += delta;
-        if(this.spawnTime >= this.spawnInterval){
-            this.spawnObstacle();
+            this.obstacles.clear(true, true);
+            this.gameOverContainer.setAlpha(0);
+            this.anims.resumeAll();
+            
+            this.isGameRuninng = true;
+        })
+    }
+
+    handleObstacleCollisions(){
+        this.physics.add.collider(this.player, this.obstacles, () => {
+            this.isGameRuninng = false;
+            this.physics.pause();
+            this.player.die();
+            this.gameOverContainer.setAlpha(1);
+
             this.spawnTime = 0;
-        }
-        Phaser.Actions.IncX(this.obstacles.getChildren(), -this.gameSpeed);
-
-
-
-            this.obstacles.getChildren().forEach((obstacle: SpriteWithDynamicBody)=>{
-                if(obstacle.getBounds().right < 0){
-                    this.obstacles.remove(obstacle);
-                }
-            })
-            this.ground.tilePositionX += this.gameSpeed
-        
-    }
-
-    createPlayer(){
-        this.player = new Player(this, 0, this.gameHeight);
-        }
-    
-    createEnvironment(){
-        this.ground =    this.add.tileSprite(0, this.gameHeight, 100, 26, "ground")
-        .setOrigin(0, 1);
-    }
-
-    spawnObstacle(){
-        const obstacleNumber: number = Math.floor(Math.random() * PRELOAD_CONFIG.cactusesCount) + 1;
-        const distance = Phaser.Math.Between(600, 900);
-        this.obstacles
-            .create(distance, this.gameHeight, `obstacle-${obstacleNumber}`)
-            .setOrigin(0, 1)
-            .setImmovable();
+            this.gameSpeed = 5;
+        })
     }
 }
 
