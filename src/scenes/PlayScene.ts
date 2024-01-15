@@ -12,11 +12,19 @@ class PlayScene extends GameScene {
     gameOverText: Phaser.GameObjects.Image;
     restartText: Phaser.GameObjects.Image;
     startTrigger: SpriteWithDynamicBody;
+    highScoreText: Phaser.GameObjects.Text;
+
+    scoreText: Phaser.GameObjects.Text;
 
     gameOverContainer: Phaser.GameObjects.Container;
+    score: number = 0;
+    scoreInterval: number = 100;
+    scoreDeltaTime: number = 0;
+
     spawnInterval: number = 1500;
     spawnTime: number = 0;
     gameSpeed: number = 4;
+    gameSpeedModifier: number = 1;
 
     constructor(){
         super("PlayScene");
@@ -28,6 +36,7 @@ class PlayScene extends GameScene {
         this.createObstacles();
         this.createGameOverContainer();
         this.createAnimations();
+        this.createScore();
         this.handleGameStart();
         this.handleObstacleCollisions();
         this.handleGameRestart();
@@ -38,12 +47,26 @@ class PlayScene extends GameScene {
         if(!this.isGameRuninng) { return; }
 
         this.spawnTime += delta;
+        this.scoreDeltaTime += delta;
+        if(this.scoreDeltaTime >= this.scoreInterval){
+            this.score++
+            this.scoreDeltaTime = 0;
+
+            if(this.score % 100 === 0) { this.gameSpeedModifier += 0.1};
+        }
+
         if(this.spawnTime >= this.spawnInterval){
             this.spawnObstacle();
             this.spawnTime = 0;
         }
-        Phaser.Actions.IncX(this.obstacles.getChildren(), -this.gameSpeed);
+        Phaser.Actions.IncX(this.obstacles.getChildren(), -this.gameSpeed*this.gameSpeedModifier);
         Phaser.Actions.IncX(this.clouds.getChildren(), -0.5);
+
+        const score = Array.from(String(this.score), Number);
+        for(let i =0; i<5 - String(this.score).length; i ++){
+            score.unshift(0);
+        }
+        this.scoreText.setText(score.join(""));
 
             this.obstacles.getChildren().forEach((obstacle: SpriteWithDynamicBody)=>{
                 if(obstacle.getBounds().right < 0){
@@ -55,7 +78,7 @@ class PlayScene extends GameScene {
                     cloud.x =this.gameWidth + 100;
                 }
             });
-            this.ground.tilePositionX += this.gameSpeed
+            this.ground.tilePositionX += (this.gameSpeed*this.gameSpeedModifier)
         
     }
 
@@ -102,6 +125,21 @@ class PlayScene extends GameScene {
         })
     }
 
+    createScore(){
+        this.scoreText = this.add.text(this.gameWidth, 0, "00000", {
+            fontFamily: "Arial",
+            fontSize: 30,
+            color: "#535353",
+            resolution: 5
+        }).setOrigin(1, 0).setAlpha(0);
+
+        this.highScoreText = this.add.text(this.scoreText.getBounds().left - 20, 0, "00000", {
+            fontFamily: "Arial",
+            fontSize: 30,
+            color: "#535353",
+            resolution: 5
+        }).setOrigin(1, 0).setAlpha(0);
+    }
     spawnObstacle(){
         const obstacleNumber: number = Math.floor(Math.random() * PRELOAD_CONFIG.cactusesCount + PRELOAD_CONFIG.birdsCount) + 1;
         const distance = Phaser.Math.Between(150, 300);
@@ -144,6 +182,7 @@ class PlayScene extends GameScene {
                         this.player.setVelocityX(0);
                         RollOutEvent.remove();
                         this.clouds.setAlpha(1);
+                        this.scoreText.setAlpha(1);
                         this.isGameRuninng = true;
                     }
                 }
@@ -171,9 +210,10 @@ class PlayScene extends GameScene {
             this.anims.pauseAll();
             this.player.die();
             this.gameOverContainer.setAlpha(1);
-
+            this.score = 0;
             this.spawnTime = 0;
-            this.gameSpeed = 5;
+            this.scoreDeltaTime = 0;
+            this.gameSpeedModifier = 1;
         })
     }
 }
