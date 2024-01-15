@@ -13,6 +13,9 @@ class PreloadScene extends Phaser.Scene {
         this.load.image("restart", "assets/restart.png");
         this.load.image("game-over", "assets/game-over.png");
         this.load.image("cloud", "assets/cloud.png");
+        this.load.audio("jump", "assets/jump.m4a");
+        this.load.audio("hit", "assets/hit.m4a");
+        this.load.audio("progress", "assets/reach.m4a");
 
         for( let i = 1; i < PRELOAD_CONFIG.cactusesCount + 1; i++){
             this.load.image(`obstacle-${i}`, `assets/cactuses_${i}.png`)

@@ -25,6 +25,8 @@ class PlayScene extends GameScene {
     spawnTime: number = 0;
     gameSpeed: number = 4;
     gameSpeedModifier: number = 1;
+    progressSound: Phaser.Sound.HTML5AudioSound;
+
 
     constructor(){
         super("PlayScene");
@@ -41,6 +43,8 @@ class PlayScene extends GameScene {
         this.handleObstacleCollisions();
         this.handleGameRestart();
 
+        this.progressSound = this.sound.add("progress", {volume: 0.2}) as Phaser.Sound.HTML5AudioSound;
+
     }
 
     update(time: number, delta: number): void {
@@ -52,7 +56,18 @@ class PlayScene extends GameScene {
             this.score++
             this.scoreDeltaTime = 0;
 
-            if(this.score % 100 === 0) { this.gameSpeedModifier += 0.1};
+            if(this.score % 100 === 0) { 
+                this.gameSpeedModifier += 0.1;
+                this.progressSound.play();
+            
+            this.tweens.add({
+                targets: this.scoreText,
+                duration: 100,
+                repeat: 3,
+                alpha: 0,
+                yoyo: true
+            })
+        };
         }
 
         if(this.spawnTime >= this.spawnInterval){
@@ -210,6 +225,12 @@ class PlayScene extends GameScene {
             this.anims.pauseAll();
             this.player.die();
             this.gameOverContainer.setAlpha(1);
+
+            const newHighScore = this.highScoreText.text.substring(this.highScoreText.text.length-5);
+            const newScore = Number(this.scoreText.text) > Number(newHighScore) ? this.scoreText.text : newHighScore
+            this.highScoreText.setText("HI " + newScore)
+            this.highScoreText.setAlpha(1);
+            
             this.score = 0;
             this.spawnTime = 0;
             this.scoreDeltaTime = 0;
