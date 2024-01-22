@@ -1,8 +1,8 @@
-# Phaser: Alpaca run
+# Phaser: Dino run
 made by: Daniel Kolas, January 2024
 
 ## General info
-This is a simple running alpaca app, based on the Chrome Dino game. I made my own graphics as well.
+This is a simple running dino app, based on the Chrome Dino game. I made my graphics as well.
 
 ## Technologies
 The project is created with:
@@ -24,7 +24,7 @@ $ npm run dev
 
 ## Features
 * Game initial files
-* Physics, collisions and score system
+* Physics, collisions, and score system
 * Multiple scenes
 * Pixel art
 * Animations and sounds
