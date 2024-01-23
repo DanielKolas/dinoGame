@@ -19,7 +19,6 @@ class PreloadScene extends Phaser.Scene {
 
         for( let i = 1; i < PRELOAD_CONFIG.cactusesCount + 1; i++){
             this.load.image(`obstacle-${i}`, `assets/cactuses_${i}.png`)
-            console.log("obstacle "+ i + " loaded")
         }
 
         this.load.spritesheet("dino-run", "assets/dino-run.png",{
