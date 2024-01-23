@@ -1,25 +1,31 @@
-# Simple Phaser3 with TS Template
+# Phaser: Dino run
+made by: Daniel Kolas, January 2024
+
+## General info
+This is a simple running dino app, based on the Chrome Dino game clone made by Filip Jerga.
+
+## Technologies
+The project is created with:
+* HTML
+* CSS
+* JS
+* TS
+* Node.js
+* Phaser
+* Adobe Photoshop
 
 ## Setup
-
-1. If you don’t have Node.js installed, [install it from here](https://nodejs.org/en/) (Node.js version >= 14.6.0 required)
-
-2. Clone this repository or Download
-
-3. Navigate into the project directory
-
-```bash
-  $ cd phaser3-typescript-simple-template
+To run this project, install it locally using npm:
+```
+$ cd ../lorem
+$ npm install
+$ npm run dev
 ```
 
-4. Install the requirements
-
-```bash
-  $ npm install
-```
-
-5. Run the app
-
-```bash
-  $ npm run dev
-```
+## Features
+* Game initial files
+* Physics, collisions, and score system
+* Multiple scenes
+* Pixel art
+* Animations and sounds
+* Score system
