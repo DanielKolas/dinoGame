@@ -2,7 +2,7 @@
 made by: Daniel Kolas, January 2024
 
 ## General info
-This is a simple running dino app, based on the Chrome Dino game. I made my graphics as well.
+This is a simple running dino app, based on the Chrome Dino game clone made by Filip Jerga.
 
 ## Technologies
 The project is created with:
