@@ -27,7 +27,6 @@ class PlayScene extends GameScene {
     gameSpeedModifier: number = 1;
     progressSound: Phaser.Sound.HTML5AudioSound;
 
-
     constructor(){
         super("PlayScene");
     }
@@ -44,7 +43,6 @@ class PlayScene extends GameScene {
         this.handleGameRestart();
 
         this.progressSound = this.sound.add("progress", {volume: 0.2}) as Phaser.Sound.HTML5AudioSound;
-
     }
 
     update(time: number, delta: number): void {
@@ -59,7 +57,7 @@ class PlayScene extends GameScene {
             if(this.score % 100 === 0) { 
                 this.gameSpeedModifier += 0.1;
                 this.progressSound.play();
-            
+
             this.tweens.add({
                 targets: this.scoreText,
                 duration: 100,
@@ -100,7 +98,7 @@ class PlayScene extends GameScene {
     createPlayer(){
         this.player = new Player(this, 0, this.gameHeight);
         }
-    
+
     createEnvironment(){
         this.ground = this.add.tileSprite(0, this.gameHeight, 100, 26, "ground")
         .setOrigin(0, 1);
@@ -112,16 +110,14 @@ class PlayScene extends GameScene {
             this.add.image(this.gameWidth - 80, 80, "cloud"),
             this.add.image(this.gameWidth / 1.3, 100, "cloud")
         ])
-
         this.clouds.setAlpha(0);
     }
 
     createObstacles(){
         this.obstacles = this.physics.add.group();
-
     }
-    createGameOverContainer(){
 
+    createGameOverContainer(){
         this.gameOverText = this.add.image(0, -60, "game-over");
         this.restartText = this.add.image(0, 0, "restart").setInteractive();
         this.restartText.scale = 0.75
@@ -131,6 +127,7 @@ class PlayScene extends GameScene {
             .add([this.gameOverText, this.restartText])
             .setAlpha(0);
     }
+
     createAnimations(){
         this.anims.create({
             key: "enemy-bird-fly",
@@ -155,6 +152,7 @@ class PlayScene extends GameScene {
             resolution: 5
         }).setOrigin(1, 0).setAlpha(0);
     }
+
     spawnObstacle(){
         const obstacleNumber: number = Math.floor(Math.random() * PRELOAD_CONFIG.cactusesCount + PRELOAD_CONFIG.birdsCount) + 1;
         const distance = Phaser.Math.Between(150, 300);

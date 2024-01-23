@@ -16,12 +16,11 @@ const config: Phaser.Types.Core.GameConfig = {
   transparent: true,
   physics: {
     default: 'arcade',
-    arcade: {
-      debug: true
-    }
+    // arcade: {
+    //   debug: true
+    // }
   },
   scene: [PreloadScene, PlayScene]
 };
 
 new Phaser.Game(config);
-

@@ -15,8 +15,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.init();
         this.scene.events.on(Phaser.Scenes.Events.UPDATE, this.update, this);
-
     }
+
     init() {
         this.cursors = this.scene.input.keyboard.createCursorKeys();
         this
@@ -29,6 +29,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.registerAnimations();
         this.registerSounds();
     }
+
     update() {
         const { space, down } = this.cursors;
         const isSpaceJustDown = Phaser.Input.Keyboard.JustDown(space);
@@ -62,9 +63,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             this.playRunAnimation();
         }
     }
+
     playRunAnimation(){
         this.body.height <= 58 ? this.play("dino-down", true) : this.play("dino-run", true);
     }
+
     registerAnimations(){
         this.anims.create({
             key: "dino-run",
@@ -80,15 +83,15 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             repeat: -1
         })
     }
+
     registerSounds(){
         this.jumpSound = this.scene.sound.add("jump", {volume: 0.2}) as Phaser.Sound.HTML5AudioSound;
         this.hitSound = this.scene.sound.add("hit", {volume: 0.3}) as Phaser.Sound.HTML5AudioSound;
-
     }
+
     die(){
         this.anims.pause();
         this,this.setTexture("dino-hurt");
         this.hitSound.play();
     }
-
 }
